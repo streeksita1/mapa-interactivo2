@@ -114,15 +114,44 @@
   // Referencia al div flotante de país
   const countryLabel = document.getElementById('countryLabel');
 
-  // --- Crea los grupos de capas para el filtrado ---
-  const layerGroupPuertos = L.layerGroup();
-  const layerGroupAeropuertos = L.layerGroup();
+ // Crear los grupos de capas para el filtrado
+const layerGroupPuertos = L.layerGroup();
+const layerGroupAeropuertos = L.layerGroup();
 
-  // Agrega el control de capas (filtro)
-  L.control.layers(null, {
-    '🛳️ Puertos': layerGroupPuertos,
-    '✈️ Aeropuertos': layerGroupAeropuertos
-  }).addTo(map);
+const overlays = {
+  '🛳️ Puertos': layerGroupPuertos,
+  '✈️ Aeropuertos': layerGroupAeropuertos
+};
+
+// ------ FUNCIONES PARA GUARDAR Y RESTAURAR CAPAS ACTIVAS ------
+function getActiveLayers() {
+  try {
+    return JSON.parse(localStorage.getItem("activeLayers")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveActiveLayers(activeLayers) {
+  localStorage.setItem("activeLayers", JSON.stringify(activeLayers));
+}
+
+// Control de capas
+const layersControl = L.control.layers(null, overlays).addTo(map);
+
+// --- Añadir los grupos al mapa según lo que el usuario dejó activo ---
+const activeLayers = getActiveLayers();
+if (activeLayers.includes('🛳️ Puertos')) layerGroupPuertos.addTo(map);
+if (activeLayers.includes('✈️ Aeropuertos')) layerGroupAeropuertos.addTo(map);
+
+// --- Detectar cambios de filtros y guardarlos ---
+map.on('overlayadd overlayremove', function() {
+  const shown = [];
+  if (map.hasLayer(layerGroupPuertos)) shown.push('🛳️ Puertos');
+  if (map.hasLayer(layerGroupAeropuertos)) shown.push('✈️ Aeropuertos');
+  saveActiveLayers(shown);
+});
+
 
   // Listado de países con color rojo (coloreados por imagen)
   const paisesColoreadosImagen = new Set([
