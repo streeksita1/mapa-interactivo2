@@ -82,6 +82,12 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.2);
     padding: 10px;
   }
+.leaflet-interactive.hovered {
+  transform: scale(1.02);
+  transform-origin: center;
+  transition: transform 0.2s;
+}
+
 </style>
 
         </head>
@@ -165,70 +171,12 @@
                       weight: 1
                     };
                   },
-                  onEachFeature: (feature, layer) => {
-                    const rawName = feature.properties.ADMIN || feature.properties.name || "Sin nombre";
+                  .leaflet-interactive.hovered {
+  transform: scale(1.02);
+  transform-origin: center;
+  transition: transform 0.2s;
+}
 
-// Diccionario seguro de ISO_A2 válidos
-const isoCodesManual = {
-  "France": "fr",
-  "Germany": "de",
-  "Italy": "it",
-  "Spain": "es",
-  "Portugal": "pt",
-  "Belgium": "be",
-  "Poland": "pl",
-  "Netherlands": "nl",
-  "Luxembourg": "lu",
-  "Bulgaria": "bg",
-  "United Kingdom": "gb",
-  "Ireland": "ie",
-  "Switzerland": "ch",
-  "Austria": "at",
-  "Czechia": "cz",
-  "Sweden": "se",
-  "Norway": "no",
-  "Denmark": "dk",
-  "Finland": "fi"
-};
-
-const isoCode = isoCodesManual[rawName] || '';
-const banderaURL = isoCode ? `https://flagcdn.com/40x30/${isoCode}.png` : '';
-const moneda = divisas[rawName] || 'Moneda no especificada';
-
-                    // Mostrar etiqueta flotante
-                    layer.on('mouseover', (e) => {
-                      layer.setStyle({ fillOpacity: 0.9 });
-                      countryLabel.innerHTML = banderaURL
-                        ? `<img src="${banderaURL}"> <strong>${rawName}</strong> - ${moneda}`
-                        : `<strong>${rawName}</strong> - ${moneda}`;
-                      countryLabel.style.display = 'flex';
-                    });
-
-                    // Mover la etiqueta con el mouse
-                    layer.on('mousemove', (e) => {
-                      countryLabel.style.left = (e.originalEvent.offsetX + 10) + 'px';
-                      countryLabel.style.top = (e.originalEvent.offsetY - 20) + 'px';
-                    });
-
-                    // Ocultar etiqueta al salir
-                    layer.on('mouseout', () => {
-                      layer.setStyle({ fillOpacity: 0.7 });
-                      countryLabel.style.display = 'none';
-                    });
-
-                    // Redirigir o mostrar popup al hacer clic
-                    layer.on('click', () => {
-                      if (paisesObjetivo[rawName]) {
-                        window.location.href = paisesObjetivo[rawName];
-                      } else {
-                        const img = banderaURL ? `<img src="${banderaURL}" width="40" height="30" style="margin-bottom:4px;"><br>` : '';
-                        L.popup()
-                          .setLatLng(layer.getBounds().getCenter())
-                          .setContent(`${img}<strong>${rawName}</strong><br>${moneda}<br>Información general`)
-                          .openOn(map);
-                      }
-                    });
-                  }
                 }).addTo(map);
 
                 // Lista de puertos con sus coordenadas
