@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mapa Interactivo de Europa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      background: linear-gradient(120deg, #1e1e2f, #3a0ca3);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #ffffff;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      color: #f1f1f1;
+      text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      color: #dddddd;
+      margin-bottom: 2rem;
+    }
+
+    .btn-start {
+      background-color: #ffcc00;
+      color: #000;
+      padding: 0.9rem 2.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .btn-start:hover {
+      background-color: #f5b800;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      color: #ddd;
+      font-size: 0.9rem;
+      padding: 1rem 2rem;
+    }
+
+    .footer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-titles {
+      margin-bottom: 0.5rem;
+    }
+
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3rem;
+      text-align: left;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    footer strong {
+      color: #ffcc00;
+    }
+
+    @media (max-width: 600px) {
+      .columns {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mapa Interactivo de Europa</h1>
+  <p>Consulta información económica, geográfica y comercial de los países europeos. Recorre el continente visualmente y descubre datos clave de forma intuitiva.</p>
+  <a href="mapaint.html" class="btn-start">Ingresar al Mapa</a>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-titles">
+        <div><strong>Materia:</strong> Geografía Económica</div>
+        <div><strong>Integrantes:</strong></div>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <div>Ángeles Granados Arlet — 233110326</div>
+          <div>Calva Martínez Hannia Shael — 233111275</div>
+          <div>Candelario Cruz Jesús David — 233110644</div>
+        </div>
+        <div class="column">
+          <div>Granillo Martínez Fátima — 233110804</div>
+          <div>Hernández Espinoza Yocelin Melissa — 233111551</div>
+          <div>Maquitico Martínez John Dilan — 233110259</div>
+        </div>
+      </div>
+      <div style="margin-top: 1rem;">
+        <strong>Docente:</strong> Mtro. Dan Omar Vera Olvera
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
