@@ -227,9 +227,6 @@
                   marker.on("mouseover", () => marker.openPopup());
                   marker.on("mouseout", () => marker.closePopup());
                   marker.on("click", () => {
-                    const cleanName = a.name.toLowerCase().replace("aeropuerto de ", "").replace("aeropuerto ", "").replace(/[^a-z0-9]/g, "_");
-                    const filename = `aeropuerto_${cleanName}.html`;
-                    window.location.href = filename;
                   });
                 });
               });
