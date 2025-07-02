@@ -102,189 +102,193 @@
           <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
           <script>
-            // Crear el mapa y centrarlo sobre Europa
-            const map = L.map('map').setView([47, 10], 4.55);
+            
+  // Crear el mapa y centrarlo sobre Europa
+  const map = L.map('map').setView([47, 10], 4.55);
 
-            // Capa base de OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+  // Capa base de OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-            // Referencia al div flotante de país
-            const countryLabel = document.getElementById('countryLabel');
+  // Referencia al div flotante de país
+  const countryLabel = document.getElementById('countryLabel');
 
-            // Listado de países con color rojo (coloreados por imagen)
-            const paisesColoreadosImagen = new Set([
-              "Portugal", "France", "Belgium", "Luxembourg", "Germany", "Switzerland", "Austria", "Italy", "Monaco",
-              "San Marino", "Liechtenstein", "Andorra", "United Kingdom", "Ireland", "Norway", "Sweden", "Finland",
-              "Denmark", "Iceland", "Estonia", "Latvia", "Lithuania", "Poland", "Czechia", "Slovakia", "Hungary",
-              "Slovenia", "Croatia", "Bosnia and Herzegovina", "Serbia", "Republic of Serbia", "Montenegro", "Kosovo",
-              "Albania", "North Macedonia", "Greece", "Bulgaria", "Romania", "Moldova", "Ukraine", "Belarus",
-              "Russia", "Georgia", "Armenia", "Azerbaijan", "Kazakhstan"
-            ]);
+  // --- Crea los grupos de capas para el filtrado ---
+  const layerGroupPuertos = L.layerGroup();
+  const layerGroupAeropuertos = L.layerGroup();
 
-            // Países destacados en color verde
-            const paisesVerdes = new Set([
-              "Italy", "Germany", "Netherlands", "France", "Spain",
-              "Belgium", "Luxembourg", "Portugal", "Bulgaria", "Poland"
-            ]);
+  // Agrega el control de capas (filtro)
+  L.control.layers(null, {
+    '🛳️ Puertos': layerGroupPuertos,
+    '✈️ Aeropuertos': layerGroupAeropuertos
+  }).addTo(map);
 
-            // Enlaces a archivos HTML por país
-            const paisesObjetivo = {
-              "Spain": "espana.html", "France": "francia.html", "Germany": "alemania.html", "Italy": "italia.html",
-              "Portugal": "portugal.html", "Belgium": "belgica.html", "Poland": "polonia.html",
-              "Netherlands": "paises_bajos.html", "Bulgaria": "bulgaria.html", "Luxembourg": "luxemburgo.html"
-            };
+  // Listado de países con color rojo (coloreados por imagen)
+  const paisesColoreadosImagen = new Set([
+    "Portugal", "France", "Belgium", "Luxembourg", "Germany", "Switzerland", "Austria", "Italy", "Monaco",
+    "San Marino", "Liechtenstein", "Andorra", "United Kingdom", "Ireland", "Norway", "Sweden", "Finland",
+    "Denmark", "Iceland", "Estonia", "Latvia", "Lithuania", "Poland", "Czechia", "Slovakia", "Hungary",
+    "Slovenia", "Croatia", "Bosnia and Herzegovina", "Serbia", "Republic of Serbia", "Montenegro", "Kosovo",
+    "Albania", "North Macedonia", "Greece", "Bulgaria", "Romania", "Moldova", "Ukraine", "Belarus",
+    "Russia", "Georgia", "Armenia", "Azerbaijan", "Kazakhstan"
+  ]);
 
-            // Información de divisas por país
-            const divisas = {
-              "Germany": "Euro (€)", "France": "Euro (€)", "Spain": "Euro (€)", "Italy": "Euro (€)", "Portugal": "Euro (€)",
-              "United Kingdom": "Libra esterlina (£)", "Ireland": "Euro (€)", "Poland": "Złoty (zł)", "Ukraine": "Grivna (₴)",
-              "Greece": "Euro (€)", "Sweden": "Corona sueca (kr)", "Norway": "Corona noruega (kr)", "Finland": "Euro (€)",
-              "Austria": "Euro (€)", "Hungary": "Forinto (Ft)", "Switzerland": "Franco suizo (CHF)", "Belgium": "Euro (€)",
-              "Netherlands": "Euro (€)", "Denmark": "Corona danesa (kr)", "Russia": "Rublo (₽)",
-              "Romania": "Leu rumano (lei)", "Bulgaria": "Lev (лв)", "Czechia": "Corona checa (Kč)", "Slovakia": "Euro (€)",
-              "Slovenia": "Euro (€)", "Croatia": "Euro (€)", "Serbia": "Dinar serbio (дин)", "Republic of Serbia": "Dinar serbio (дин)",
-              "Bosnia and Herzegovina": "Marco convertible (KM)", "North Macedonia": "Dinar macedonio (ден)", "Montenegro": "Euro (€)",
-              "Albania": "Lek (L)", "Iceland": "Corona islandesa (kr)", "Lithuania": "Euro (€)", "Latvia": "Euro (€)", "Estonia": "Euro (€)",
-              "Moldova": "Leu moldavo (L)", "Belarus": "Rublo bielorruso (Br)", "Luxembourg": "Euro (€)", "Malta": "Euro (€)",
-              "Andorra": "Euro (€)", "Monaco": "Euro (€)", "Liechtenstein": "Franco suizo (CHF)", "San Marino": "Euro (€)",
-              "Vatican": "Euro (€)", "Kosovo": "Euro (€)", "Georgia": "Lari (₾)", "Armenia": "Dram (֏)", "Azerbaijan": "Manat (₼)",
-              "Kazakhstan": "Tenge (₸)"
-            };
+  // Países destacados en color verde
+  const paisesVerdes = new Set([
+    "Italy", "Germany", "Netherlands", "France", "Spain",
+    "Belgium", "Luxembourg", "Portugal", "Bulgaria", "Poland"
+  ]);
 
-            // Cargar archivo GeoJSON de países y agregar estilo/interactividad
-            fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-              .then(res => res.json())
-              .then(data => {
-                L.geoJSON(data, {
-                  style: (feature) => {
-                    const name = feature.properties.ADMIN || feature.properties.name || '';
-                    return {
-                      fillColor: paisesVerdes.has(name)
-                        ? '#70c167' // verde
-                        : paisesColoreadosImagen.has(name)
-                        ? '#e26a6a' // rojo
-                        : '#4a90e2', // azul
-                      fillOpacity: 0.7,
-                      color: '#555',
-                      weight: 1
-                    };
-                  },
-                  onEachFeature: (feature, layer) => {
-  const rawName = feature.properties.ADMIN || feature.properties.name || "Sin nombre";
-
-  const isoCodesManual = {
-    "France": "fr", "Germany": "de", "Italy": "it", "Spain": "es", "Portugal": "pt",
-    "Belgium": "be", "Poland": "pl", "Netherlands": "nl", "Luxembourg": "lu", "Bulgaria": "bg",
-    "United Kingdom": "gb", "Ireland": "ie", "Switzerland": "ch", "Austria": "at", "Czechia": "cz",
-    "Sweden": "se", "Norway": "no", "Denmark": "dk", "Finland": "fi"
+  // Enlaces a archivos HTML por país
+  const paisesObjetivo = {
+    "Spain": "espana.html", "France": "francia.html", "Germany": "alemania.html", "Italy": "italia.html",
+    "Portugal": "portugal.html", "Belgium": "belgica.html", "Poland": "polonia.html",
+    "Netherlands": "paises_bajos.html", "Bulgaria": "bulgaria.html", "Luxembourg": "luxemburgo.html"
   };
 
-  const isoCode = isoCodesManual[rawName] || '';
-  const banderaURL = isoCode ? `https://flagcdn.com/40x30/${isoCode}.png` : '';
-  const moneda = divisas[rawName] || 'Moneda no especificada';
+  // Información de divisas por país
+  const divisas = {
+    "Germany": "Euro (€)", "France": "Euro (€)", "Spain": "Euro (€)", "Italy": "Euro (€)", "Portugal": "Euro (€)",
+    "United Kingdom": "Libra esterlina (£)", "Ireland": "Euro (€)", "Poland": "Złoty (zł)", "Ukraine": "Grivna (₴)",
+    "Greece": "Euro (€)", "Sweden": "Corona sueca (kr)", "Norway": "Corona noruega (kr)", "Finland": "Euro (€)",
+    "Austria": "Euro (€)", "Hungary": "Forinto (Ft)", "Switzerland": "Franco suizo (CHF)", "Belgium": "Euro (€)",
+    "Netherlands": "Euro (€)", "Denmark": "Corona danesa (kr)", "Russia": "Rublo (₽)",
+    "Romania": "Leu rumano (lei)", "Bulgaria": "Lev (лв)", "Czechia": "Corona checa (Kč)", "Slovakia": "Euro (€)",
+    "Slovenia": "Euro (€)", "Croatia": "Euro (€)", "Serbia": "Dinar serbio (дин)", "Republic of Serbia": "Dinar serbio (дин)",
+    "Bosnia and Herzegovina": "Marco convertible (KM)", "North Macedonia": "Dinar macedonio (ден)", "Montenegro": "Euro (€)",
+    "Albania": "Lek (L)", "Iceland": "Corona islandesa (kr)", "Lithuania": "Euro (€)", "Latvia": "Euro (€)", "Estonia": "Euro (€)",
+    "Moldova": "Leu moldavo (L)", "Belarus": "Rublo bielorruso (Br)", "Luxembourg": "Euro (€)", "Malta": "Euro (€)",
+    "Andorra": "Euro (€)", "Monaco": "Euro (€)", "Liechtenstein": "Franco suizo (CHF)", "San Marino": "Euro (€)",
+    "Vatican": "Euro (€)", "Kosovo": "Euro (€)", "Georgia": "Lari (₾)", "Armenia": "Dram (֏)", "Azerbaijan": "Manat (₼)",
+    "Kazakhstan": "Tenge (₸)"
+  };
 
-  layer.on('mouseover', (e) => {
-    layer.setStyle({ fillOpacity: 0.9 });
-    layer.getElement()?.classList.add('hovered'); // 👈 efecto hover
+  // Cargar archivo GeoJSON de países y agregar estilo/interactividad
+  fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+    .then(res => res.json())
+    .then(data => {
+      L.geoJSON(data, {
+        style: (feature) => {
+          const name = feature.properties.ADMIN || feature.properties.name || '';
+          return {
+            fillColor: paisesVerdes.has(name)
+              ? '#70c167' // verde
+              : paisesColoreadosImagen.has(name)
+              ? '#e26a6a' // rojo
+              : '#4a90e2', // azul
+            fillOpacity: 0.7,
+            color: '#555',
+            weight: 1
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const rawName = feature.properties.ADMIN || feature.properties.name || "Sin nombre";
+          const isoCodesManual = {
+            "France": "fr", "Germany": "de", "Italy": "it", "Spain": "es", "Portugal": "pt",
+            "Belgium": "be", "Poland": "pl", "Netherlands": "nl", "Luxembourg": "lu", "Bulgaria": "bg",
+            "United Kingdom": "gb", "Ireland": "ie", "Switzerland": "ch", "Austria": "at", "Czechia": "cz",
+            "Sweden": "se", "Norway": "no", "Denmark": "dk", "Finland": "fi"
+          };
 
-    countryLabel.innerHTML = banderaURL
-      ? `<img src="${banderaURL}"> <strong>${rawName}</strong> - ${moneda}`
-      : `<strong>${rawName}</strong> - ${moneda}`;
-    countryLabel.style.display = 'flex';
-  });
+          const isoCode = isoCodesManual[rawName] || '';
+          const banderaURL = isoCode ? `https://flagcdn.com/40x30/${isoCode}.png` : '';
+          const moneda = divisas[rawName] || 'Moneda no especificada';
 
-  layer.on('mousemove', (e) => {
-    countryLabel.style.left = (e.originalEvent.offsetX + 10) + 'px';
-    countryLabel.style.top = (e.originalEvent.offsetY - 20) + 'px';
-  });
+          layer.on('mouseover', (e) => {
+            layer.setStyle({ fillOpacity: 0.9 });
+            layer.getElement()?.classList.add('hovered');
+            countryLabel.innerHTML = banderaURL
+              ? `<img src="${banderaURL}"> <strong>${rawName}</strong> - ${moneda}`
+              : `<strong>${rawName}</strong> - ${moneda}`;
+            countryLabel.style.display = 'flex';
+          });
 
-  layer.on('mouseout', () => {
-    layer.setStyle({ fillOpacity: 0.7 });
-    layer.getElement()?.classList.remove('hovered'); // 👈 quitar efecto
-    countryLabel.style.display = 'none';
-  });
+          layer.on('mousemove', (e) => {
+            countryLabel.style.left = (e.originalEvent.offsetX + 10) + 'px';
+            countryLabel.style.top = (e.originalEvent.offsetY - 20) + 'px';
+          });
 
-  layer.on('click', () => {
-    if (paisesObjetivo[rawName]) {
-      window.location.href = paisesObjetivo[rawName];
-    } else {
-      const img = banderaURL
-        ? `<img src="${banderaURL}" width="40" height="30" style="margin-bottom:4px;"><br>` : '';
-      L.popup()
-        .setLatLng(layer.getBounds().getCenter())
-        .setContent(`${img}<strong>${rawName}</strong><br>${moneda}<br>Información general`)
-        .openOn(map);
-    }
-  });
-}
+          layer.on('mouseout', () => {
+            layer.setStyle({ fillOpacity: 0.7 });
+            layer.getElement()?.classList.remove('hovered');
+            countryLabel.style.display = 'none';
+          });
 
-                }).addTo(map);
+          layer.on('click', () => {
+            if (paisesObjetivo[rawName]) {
+              window.location.href = paisesObjetivo[rawName];
+            } else {
+              const img = banderaURL
+                ? `<img src="${banderaURL}" width="40" height="30" style="margin-bottom:4px;"><br>` : '';
+              L.popup()
+                .setLatLng(layer.getBounds().getCenter())
+                .setContent(`${img}<strong>${rawName}</strong><br>${moneda}<br>Información general`)
+                .openOn(map);
+            }
+          });
+        }
+      }).addTo(map);
 
-                // Lista de puertos con sus coordenadas
-                const puertos = [
-                  { name: "Puerto de Génova", coords: [44.404, 8.932] },
-                  { name: "Puerto de Hamburgo", coords: [53.54, 9.99] },
-                  { name: "Puerto de Róterdam", coords: [51.95, 4.13] },
-                  { name: "Puerto de Le Havre", coords: [49.493, 0.107] },
-                  { name: "Puerto de Algeciras", coords: [36.127, -5.441] },
-                  { name: "Puerto de Amberes-Brujas", coords: [51.263, 4.400] },
-                  { name: "Puerto de Mertert", coords: [49.7014, 6.4806] },
-                  { name: "Puerto de Lisboa", coords: [38.708, -9.137] },
-                  { name: "Puerto de Burgas", coords: [42.49, 27.48] },
-                  { name: "Puerto de Gdańsk", coords: [54.35, 18.666] }
-                ];
+      // ---- PUERTOS y AEROPUERTOS ----
+      const puertos = [
+        { name: "Puerto de Génova", coords: [44.404, 8.932] },
+        { name: "Puerto de Hamburgo", coords: [53.54, 9.99] },
+        { name: "Puerto de Róterdam", coords: [51.95, 4.13] },
+        { name: "Puerto de Le Havre", coords: [49.493, 0.107] },
+        { name: "Puerto de Algeciras", coords: [36.127, -5.441] },
+        { name: "Puerto de Amberes-Brujas", coords: [51.263, 4.400] },
+        { name: "Puerto de Mertert", coords: [49.7014, 6.4806] },
+        { name: "Puerto de Lisboa", coords: [38.708, -9.137] },
+        { name: "Puerto de Burgas", coords: [42.49, 27.48] },
+        { name: "Puerto de Gdańsk", coords: [54.35, 18.666] }
+      ];
 
-                // Lista de aeropuertos con coordenadas
-                const aeropuertos = [
-                  { name: "Aeropuerto de Roma-Fiumicino (FCO)", coords: [41.800, 12.238] },
-                  { name: "Aeropuerto de Ámsterdam-Schiphol (AMS)", coords: [52.31, 4.768] },
-                  { name: "Aeropuerto Charles de Gaulle (París)", coords: [49.009, 2.547] },
-                  { name: "Aeropuerto Adolfo Suárez Madrid-Barajas", coords: [40.472, -3.562] },
-                  { name: "Aeropuerto de Bruselas (Zaventem)", coords: [50.901, 4.485] },
-                  { name: "Aeropuerto de Luxemburgo (Findel)", coords: [49.626, 6.213] },
-                  { name: "Aeropuerto de Sofía", coords: [42.694, 23.406] },
-                  { name: "Aeropuerto de Lisboa", coords: [38.774, -9.134] },
-                  { name: "Aeropuerto Chopin de Varsovia", coords: [52.166, 20.967] },
-                  { name: "Aeropuerto de Frankfurt", coords: [50.037, 8.562] }
-                ];
+      const aeropuertos = [
+        { name: "Aeropuerto de Roma-Fiumicino (FCO)", coords: [41.800, 12.238] },
+        { name: "Aeropuerto de Ámsterdam-Schiphol (AMS)", coords: [52.31, 4.768] },
+        { name: "Aeropuerto Charles de Gaulle (París)", coords: [49.009, 2.547] },
+        { name: "Aeropuerto Adolfo Suárez Madrid-Barajas", coords: [40.472, -3.562] },
+        { name: "Aeropuerto de Bruselas (Zaventem)", coords: [50.901, 4.485] },
+        { name: "Aeropuerto de Luxemburgo (Findel)", coords: [49.626, 6.213] },
+        { name: "Aeropuerto de Sofía", coords: [42.694, 23.406] },
+        { name: "Aeropuerto de Lisboa", coords: [38.774, -9.134] },
+        { name: "Aeropuerto Chopin de Varsovia", coords: [52.166, 20.967] },
+        { name: "Aeropuerto de Frankfurt", coords: [50.037, 8.562] }
+      ];
 
-                // Marcadores de puertos (azules)
-                puertos.forEach(p => {
-                  const marker = L.circleMarker(p.coords, {
-                    radius: 6,
-                    color: '#0057b8',
-                    fillColor: '#0057b8',
-                    fillOpacity: 0.9
-                  }).addTo(map).bindPopup(`🛳️ <strong>${p.name}</strong>`);
-                  
-                  // Mostrar popup al pasar mouse y redirigir al hacer clic
-                  marker.on("mouseover", () => marker.openPopup());
-                  marker.on("mouseout", () => marker.closePopup());
-                  marker.on("click", () => {
-                    const cleanName = p.name.toLowerCase().replace("puerto de ", "").replace(/[^a-z0-9]/g, "_");
-                    const filename = `puerto_${cleanName}.html`;
-                    window.location.href = filename;
-                  });
-                });
+      // --- Añade los marcadores SOLO a los grupos ---
+      puertos.forEach(p => {
+        const marker = L.circleMarker(p.coords, {
+          radius: 6,
+          color: '#0057b8',
+          fillColor: '#0057b8',
+          fillOpacity: 0.9
+        }).bindPopup(`🛳️ <strong>${p.name}</strong>`);
+        marker.on("mouseover", () => marker.openPopup());
+        marker.on("mouseout", () => marker.closePopup());
+        marker.on("click", () => {
+          const cleanName = p.name.toLowerCase().replace("puerto de ", "").replace(/[^a-z0-9]/g, "_");
+          window.location.href = `puerto_${cleanName}.html`;
+        });
+        layerGroupPuertos.addLayer(marker); // ✅ AÑADE SOLO AL GRUPO, NO AL MAPA
+      });
 
-                // Marcadores de aeropuertos (rojos)
-                aeropuertos.forEach(a => {
-                  const marker = L.circleMarker(a.coords, {
-                    radius: 6,
-                    color: '#d62828',
-                    fillColor: '#d62828',
-                    fillOpacity: 0.9
-                  }).addTo(map).bindPopup(`✈️ <strong>${a.name}</strong>`);
+      aeropuertos.forEach(a => {
+        const marker = L.circleMarker(a.coords, {
+          radius: 6,
+          color: '#d62828',
+          fillColor: '#d62828',
+          fillOpacity: 0.9
+        }).bindPopup(`<strong>✈️ ${a.name}</strong>`);
+        marker.on("mouseover", () => marker.openPopup());
+        marker.on("mouseout", () => marker.closePopup());
+        layerGroupAeropuertos.addLayer(marker); // ✅ AÑADE SOLO AL GRUPO, NO AL MAPA
+      });
 
-                  // Mostrar popup al pasar mouse y redirigir al hacer clic
-                  marker.on("mouseover", () => marker.openPopup());
-                  marker.on("mouseout", () => marker.closePopup());
-                  marker.on("click", () => {
-                  });
-                });
-              });
-          </script>
+      // Las capas ya están ligadas al control de Leaflet y aparecerán/desaparecerán correctamente
+    });
+</script>
+
         </body>
         </html>
