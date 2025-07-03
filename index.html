@@ -42,9 +42,16 @@
       font-size: 1.16rem;
       max-width: 680px;
       color: #dddddd;
-      margin-bottom: 2.1rem;
+      margin-bottom: 1rem;
       margin-left: auto;
       margin-right: auto;
+    }
+
+    .instructions {
+      margin-bottom: 2rem;
+      font-size: 1.05rem;
+      color: #f7f7f7;
+      line-height: 1.6;
     }
 
     .btn-start {
@@ -144,7 +151,12 @@
       p {
         font-size: 1rem;
         padding: 0 2vw;
-        margin-bottom: 1.4rem;
+        margin-bottom: 1.2rem;
+      }
+      .instructions {
+        font-size: 0.98rem;
+        padding: 0 3vw;
+        margin-bottom: 1.5rem;
       }
       .btn-start {
         font-size: 1.03rem;
@@ -169,13 +181,13 @@
         width: 94vw;
         min-width: unset;
         max-width: unset;
-        font-size: 0.98rem;
+        font-size: 0.96rem;
         gap: 2px;
       }
       footer {
         position: static;
         padding-bottom: 0.5rem;
-        font-size: 0.96rem;
+        font-size: 0.95rem;
       }
     }
   </style>
@@ -184,6 +196,14 @@
 
   <h1>Mapa Interactivo de Europa</h1>
   <p>Consulta información económica, geográfica y comercial de los países europeos. Recorre el continente visualmente y descubre datos clave de forma intuitiva.</p>
+
+  <div class="instructions">
+  🔍 Da clic en cualquier país para ver información detallada.<br>
+  🌍 Pasa el cursor sobre los países para conocer su <strong>nombre</strong> y <strong>divisa</strong>.<br>
+  🛳️ Activa o desactiva los <strong>puertos</strong> y <strong>aeropuertos</strong> con el botón de filtros en la esquina inferior izquierda.<br>
+  📍 Da clic sobre los marcadores para abrir páginas con más datos.
+</div>
+
   <a href="mapaint.html" class="btn-start">Ingresar al Mapa</a>
 
   <footer>
@@ -209,5 +229,6 @@
       </div>
     </div>
   </footer>
+
 </body>
 </html>
